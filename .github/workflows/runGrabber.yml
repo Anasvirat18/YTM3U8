@@ -3,26 +3,31 @@ name: LinkGrabber
 on:
   schedule:
     - cron: '0 */3 * * *'
-
   pull_request:
     branches: [ main ]
-
   workflow_dispatch:
+
 jobs:
-
   runCode:
-
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write   # ✅ IMPORTANT
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Grab Link
-
         run: |
-          git config --global user.email "dp247@hll.localhost"
-          git config --global user.name "dp247"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
           chmod +x exec_grabber.sh && ./exec_grabber.sh
+
           git add -A
-          git commit -m "./youtubeLink.txt is updated."
-          git push
+          git commit -m "youtubeLink.txt updated" || echo "No changes"
+
+          # ✅ FIX: sync before push
+          git pull --rebase origin main
+
+          git push origin main
